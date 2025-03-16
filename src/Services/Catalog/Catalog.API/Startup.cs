@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using Catalog.API.Models;
+using MassTransit;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 
@@ -25,6 +26,8 @@ namespace Catalog.API
                         //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     }));
+
+            services.AddTransient<IPlateRepository, PlateRepository>();
 
             services.AddSwaggerGen(options =>
             {
