@@ -1,4 +1,4 @@
-﻿@model List<Catalog.Domain.Plate>
+﻿@model WebMVC.Models.PaginatedPlatesViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -6,5 +6,30 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <a href="/AddPlate">Add New Plate</a>
+
+    <table>
+        <thead></thead>
+            <tr>
+                <td>Registration</td>
+                <td>Price</td>
+                <td>Letters</td>
+                <td>Numbers</td>
+            </tr>
+        <tbody>
+@foreach(var plate in Model.Plates) {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => plate.Registration)</td>
+                <td>@Html.DisplayFor(modelItem => plate.SalePrice)</td>
+                <td>@Html.DisplayFor(modelItem => plate.Letters)</td>
+                <td>@Html.DisplayFor(modelItem => plate.Numbers)</td>
+            </tr>
+}
+        </tbody>
+    </table>
+    <span><a href=" ?pageIndex=@Html.DisplayFor(modelItem => Model.PreviousPage)">Previous Page</a></span>
+    <span>@Html.DisplayFor(modelItem => Model.CurrentPage)</span>
+    <span><a href=" ?pageIndex=@Html.DisplayFor(modelItem => Model.NextPage)">Next Page</a></span>
+
 </div>
