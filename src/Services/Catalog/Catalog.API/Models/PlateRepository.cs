@@ -19,7 +19,7 @@ namespace Catalog.API.Models
             int pageSize = 20
         )
         {
-            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified);
+            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified, filters: null);
         }
 
         public async Task<PaginatedPlates> GetPlatesAsync(
@@ -29,8 +29,24 @@ namespace Catalog.API.Models
             SortOrder sortOrder = SortOrder.Unspecified
         )
         {
-            var totalPlates = await InventoryContext.Plates.CountAsync();
+            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified, filters: null);
+        }
+
+        public async Task<PaginatedPlates> GetPlatesAsync(
+            int pageIndex = 0,
+            int pageSize = 20,
+            string? sortField = null,
+            SortOrder sortOrder = SortOrder.Unspecified,
+            SearchFilters? filters = null
+        )
+        {
             var plateListQuery = InventoryContext.Plates.AsQueryable<Plate>();
+
+            if (filters != null)
+            {
+                plateListQuery = AddFiltersToQuery(plateListQuery, filters);
+            }
+            var totalPlates = await plateListQuery.CountAsync();
 
             _logger.LogInformation("Adding sort by {SortField} in {SortOrder}", sortField, sortOrder);
             plateListQuery = AddOrderClauseToQuery( plateListQuery, sortField, sortOrder );
@@ -70,7 +86,7 @@ namespace Catalog.API.Models
         }
 
 
-        private IQueryable<Plate> AddOrderClauseToQuery(IQueryable<Plate> query, string? sortField, SortOrder sortOrder)
+        private static IQueryable<Plate> AddOrderClauseToQuery(IQueryable<Plate> query, string? sortField, SortOrder sortOrder)
         {
             if (string.IsNullOrEmpty(sortField))
                 return query;
@@ -88,6 +104,15 @@ namespace Catalog.API.Models
             return query.OrderBy(expression);
         }
 
+        private static IQueryable<Plate> AddFiltersToQuery(IQueryable<Plate> query, SearchFilters filters)
+        {
+            if ( !string.IsNullOrEmpty(filters.Letters) )
+                query = query.Where( p => !string.IsNullOrEmpty(p.Letters) && p.Letters.Contains(filters.Letters) );
+            if ( filters.Numbers > 0 )
+                query = query.Where( p => p.Numbers>=0 && p.Numbers == filters.Numbers);
+
+            return query;
+        }
 
         private ValidationResult ValidatePlate(Guid id, Plate data)
         {

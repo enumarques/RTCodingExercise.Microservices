@@ -24,11 +24,28 @@ namespace Catalog.API.Controllers
             [FromQuery]int pageSize = 20,
             [FromQuery]int pageIndex = 0,
             [FromQuery]string? sortField = null,
-            [FromQuery]SortOrder sortOrder = SortOrder.Unspecified
+            [FromQuery]SortOrder sortOrder = SortOrder.Unspecified,
+            [FromQuery]string? letterFilter = null,
+            [FromQuery]string? numberFilter = null
         )
         {
-            _logger.LogInformation("Retrieving {PageSize} plates from page {PageIndex} by {SortField}", pageSize, pageIndex, sortField ?? "no order");
-            return Ok(await _plateRepository.GetPlatesAsync(pageIndex, pageSize, sortField, sortOrder));
+            var filters = new SearchFilters();
+            if (! string.IsNullOrEmpty(letterFilter))
+                filters.Letters = letterFilter;
+
+            if (!string.IsNullOrEmpty(numberFilter))
+            {
+                try
+                {
+                    filters.Numbers = int.Parse(numberFilter);
+                }
+                catch
+                {
+                    filters.Numbers = -1;
+                }
+            }
+
+            return Ok(await _plateRepository.GetPlatesAsync(pageIndex, pageSize, sortField, sortOrder, filters));
         }
 
         [HttpPost]
