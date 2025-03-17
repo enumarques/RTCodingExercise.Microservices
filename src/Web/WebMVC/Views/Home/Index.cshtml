@@ -17,8 +17,40 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
 
-    <a href="/AddPlate">Add New Plate</a>
-<h2>@Model.SortField - @Model.SortOrder</h2>
+    <div><a href="/AddPlate">Add New Plate</a></div>
+
+    <div>
+        <form method="get">
+            <legend>Filter results</legend>
+            <span>
+                <label for="Letters">Letters</label>
+                <input type="text" asp-for="@Model.Filter.Letters" />
+            </span>
+            <span>
+                <label for="Numbers">Numbers</label>
+                <input type="number" asp-for="@Model.Filter.Numbers" />
+            </span>
+            <span>
+                <label for="SortField">Order by</label>
+                <select asp-for="@Model.SortField">
+                    <option value="">None</option>
+                    <option value="Price">Price</option>
+                </select>
+            </span>
+            <span>
+                <label for="SortOrder">Ordering</label>
+                <select asp-for="@Model.SortOrder">
+                    <option value="@SortOrder.Unspecified">&emdash;</option>
+                    <option value="@SortOrder.Ascending">Ascending</option>
+                    <option value="@SortOrder.Descending">Descending</option>
+                </select>
+            </span>
+            <span>
+                <input type="submit" value="Get plates" />
+            </span>
+        </form>
+    </div>
+    
     <table>
         <thead></thead>
             <tr>
@@ -39,7 +71,7 @@
         </tbody>
     </table>
     <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.PreviousPage)">Previous Page</a></span>
-    <span>@Html.DisplayFor(modelItem => Model.CurrentPage)</span>
+    <span>@Model.CurrentPage</span>
     <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.NextPage)">Next Page</a></span>
 
 </div>

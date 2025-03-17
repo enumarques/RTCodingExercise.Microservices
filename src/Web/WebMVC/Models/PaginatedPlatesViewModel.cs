@@ -10,6 +10,29 @@ namespace WebMVC.Models
         public string? SortField {get;}
         public SortOrder SortOrder {get;} = SortOrder.Unspecified;
 
+        public PlateFilter Filter { get; set; } = new PlateFilter();
+
+        public PaginatedPlatesViewModel(
+            IEnumerable<Plate> plates,
+            int currentPage,
+            int? previousPage,
+            int? nextPage,
+            int totalPlates,
+            string? sortField,
+            SortOrder sortOrder,
+            PlateFilter filter
+        )
+        {
+            Plates = plates;
+            CurrentPage = currentPage;
+            PreviousPage = previousPage;
+            NextPage = nextPage;
+            TotalPlates = totalPlates;
+            SortField = sortField;
+            SortOrder = sortOrder;
+            Filter = filter;
+        }
+        
         public PaginatedPlatesViewModel(
             IEnumerable<Plate> plates,
             int currentPage,
@@ -28,7 +51,7 @@ namespace WebMVC.Models
             SortField = sortField;
             SortOrder = sortOrder;
         }
-        
+
         public PaginatedPlatesViewModel(
             IEnumerable<Plate> plates,
             int currentPage,

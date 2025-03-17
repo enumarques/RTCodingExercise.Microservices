@@ -9,6 +9,8 @@ namespace WebMVC.Models
             SortOrder sortOrder = SortOrder.Unspecified
         );
 
+        public Task<PaginatedItemsServiceResponse<Plate>> GetPlatesAsync( PlateListRequest request );
+
         public Task<bool> AddPlateAsync(
             decimal purchasePrice,
             decimal salePrice,

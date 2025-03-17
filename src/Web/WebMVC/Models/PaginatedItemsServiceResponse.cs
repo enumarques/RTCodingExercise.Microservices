@@ -8,5 +8,6 @@ namespace WebMVC.Models
         public int PageSize {get;set;} = 0;
         public string? SortField {get;set;} = null;
         public SortOrder SortOrder {get;set;} = SortOrder.Unspecified;
+        public PlateFilter? Filter {get;set;} = null;
     }
 }

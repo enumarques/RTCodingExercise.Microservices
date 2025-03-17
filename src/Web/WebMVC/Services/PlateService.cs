@@ -29,7 +29,8 @@ namespace WebMVC.Services
             int pageSize,
             int pageIndex,
             string? sortField,
-            SortOrder sortOrder
+            SortOrder sortOrder,
+            PlateFilter? filter = null
         )
         {
             _logger.LogInformation("Calling plate storage web service");
@@ -42,6 +43,11 @@ namespace WebMVC.Services
             {
                 queryParams.Add("sortField", sortField);
                 queryParams.Add("sortOrder", sortOrder.ToString());
+            }
+            if (filter != null)
+            {
+                if (!string.IsNullOrEmpty(filter.Numbers)) queryParams.Add("numberFilter", filter.Numbers);
+                if (!string.IsNullOrEmpty(filter.Letters)) queryParams.Add("letterFilter", filter.Letters);
             }
 
             var url = QueryHelpers.AddQueryString(getPlatesPath, queryParams);

@@ -17,10 +17,19 @@ namespace RTCodingExercise.Microservices.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int pageIndex = 0, string? sortField = null, SortOrder sortOrder = SortOrder.Unspecified)
+        public async Task<IActionResult> Index(int pageIndex = 0, string? sortField = null, SortOrder sortOrder = SortOrder.Unspecified, PlateFilter? filter = null)
         {
             _logger.LogInformation("Page number {PageNumber} requested", pageIndex + 1);
-            var storedPlates = await _plateRepository.GetPlatesAsync(pageIndex: pageIndex, sortField: sortField, sortOrder: sortOrder);
+            var request = new PlateListRequest(
+            )
+            {
+                PageIndex = pageIndex,
+                SortField = sortField,
+                SortOrder = sortOrder,
+                Filter = filter
+            };
+
+            var storedPlates = await _plateRepository.GetPlatesAsync(request);//pageIndex: pageIndex, sortField: sortField, sortOrder: sortOrder);
 
             var displayPlates = new PaginatedPlatesViewModel(
                 storedPlates.Items.Select( i => {i.SalePrice *= MarkupMultiplier; return i;} ).ToList(),

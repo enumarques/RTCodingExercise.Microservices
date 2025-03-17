@@ -21,6 +21,13 @@ namespace WebMVC.Models
             return await _plateService.GetPlatesAsync(pageSize, pageIndex, sortField, sortOrder);
         }
 
+        public async Task<PaginatedItemsServiceResponse<Plate>> GetPlatesAsync( PlateListRequest request )
+        {
+            _logger.LogInformation("Retrieving plates from the plate service");
+
+            return await _plateService.GetPlatesAsync(request.PageSize, request.PageIndex, request.SortField, request.SortOrder, request.Filter);
+        }
+
         public async Task<bool> AddPlateAsync(
             decimal purchasePrice,
             decimal salePrice,
