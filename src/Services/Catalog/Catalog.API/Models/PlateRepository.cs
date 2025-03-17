@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 
 namespace Catalog.API.Models
 {
@@ -13,15 +14,33 @@ namespace Catalog.API.Models
             _logger = logger;
         }
 
-        public async Task<PaginatedPlates> GetPlatesAsync(int pageIndex = 0, int pageSize = 20)
+        public async Task<PaginatedPlates> GetPlatesAsync(
+            int pageIndex = 0,
+            int pageSize = 20
+        )
+        {
+            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified);
+        }
+
+        public async Task<PaginatedPlates> GetPlatesAsync(
+            int pageIndex = 0,
+            int pageSize = 20,
+            string? sortField = null,
+            SortOrder sortOrder = SortOrder.Unspecified
+        )
         {
             var totalPlates = await InventoryContext.Plates.CountAsync();
-            var plateList = await InventoryContext.Plates
-                            .Skip(pageSize * pageIndex)
+            var plateListQuery = InventoryContext.Plates.AsQueryable<Plate>();
+
+            _logger.LogInformation("Adding sort by {SortField} in {SortOrder}", sortField, sortOrder);
+            plateListQuery = AddOrderClauseToQuery( plateListQuery, sortField, sortOrder );
+
+            var plateList = await plateListQuery.Skip(pageSize * pageIndex)
                             .Take(pageSize)
                             .ToListAsync();
 
-            return new PaginatedPlates(plateList, totalPlates, pageSize, pageIndex);
+            _logger.LogInformation("Retrieved {ResultCount} plates of {TotalPlates} from page {PageIndex}", plateList.Count, totalPlates, pageIndex);
+            return new PaginatedPlates(plateList, totalPlates, pageSize, pageIndex, sortField, sortOrder);
         }
 
         public async Task<Result<Plate>> AddPlateAsync(Guid Id, Plate plateData)
@@ -49,6 +68,26 @@ namespace Catalog.API.Models
 
             return new Result<Plate>(result.Entity);
         }
+
+
+        private IQueryable<Plate> AddOrderClauseToQuery(IQueryable<Plate> query, string? sortField, SortOrder sortOrder)
+        {
+            if (string.IsNullOrEmpty(sortField))
+                return query;
+
+            var sortBy = (SortField)Enum.Parse(typeof(SortField), sortField);
+            if (sortBy == SortField.None)
+                return query;
+
+            Expression<Func<Plate, object>> expression = sortBy == SortField.Price ? plate => plate.SalePrice : plate => plate.Id;
+            if (sortOrder == SortOrder.Descending)
+            {
+                return query.OrderByDescending(expression);
+            }
+
+            return query.OrderBy(expression);
+        }
+
 
         private ValidationResult ValidatePlate(Guid id, Plate data)
         {

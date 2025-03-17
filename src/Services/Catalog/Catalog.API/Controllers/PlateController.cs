@@ -4,7 +4,8 @@ using Catalog.API.Models;
 
 namespace Catalog.API.Controllers 
 {
-    [Route("api/[controller]")]
+    [Route("/api/plate")]
+    [ApiController]
     public class PlateController : Controller
     {
         private ILogger<PlateController> _logger {get;set;}
@@ -21,11 +22,13 @@ namespace Catalog.API.Controllers
         [ProducesResponseType(typeof(PaginatedPlates), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ListAsync(
             [FromQuery]int pageSize = 20,
-            [FromQuery]int pageIndex = 0
+            [FromQuery]int pageIndex = 0,
+            [FromQuery]string? sortField = null,
+            [FromQuery]SortOrder sortOrder = SortOrder.Unspecified
         )
         {
-            _logger.LogInformation("Retrieving {PageSize} plates from page {PageIndex}", pageSize, pageIndex);
-            return Ok(await _plateRepository.GetPlatesAsync(pageIndex, pageSize));
+            _logger.LogInformation("Retrieving {PageSize} plates from page {PageIndex} by {SortField}", pageSize, pageIndex, sortField ?? "no order");
+            return Ok(await _plateRepository.GetPlatesAsync(pageIndex, pageSize, sortField, sortOrder));
         }
 
         [HttpPost]
