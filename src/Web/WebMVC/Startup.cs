@@ -1,5 +1,7 @@
 ﻿using MassTransit;
 using RabbitMQ.Client;
+using WebMVC.Models;
+using WebMVC.Services;
 
 namespace RTCodingExercise.WebMVC
 {
@@ -18,6 +20,7 @@ namespace RTCodingExercise.WebMVC
             services.AddControllers();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddScoped<IPlateRepository, PlateRepository>();
 
             services.AddMassTransit(x =>
             {
@@ -43,6 +46,8 @@ namespace RTCodingExercise.WebMVC
                     cfg.ExchangeType = ExchangeType.Fanout;
                 });
             });
+
+            services.AddHttpClient<IPlateServiceClient, PlateServiceClient>(c => c.BaseAddress = new Uri(Configuration["PlateService:BaseUri"]));
 
             services.AddMassTransitHostedService();
         }
