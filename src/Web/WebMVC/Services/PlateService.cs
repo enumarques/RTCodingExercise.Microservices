@@ -1,5 +1,4 @@
 using WebMVC.Models;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace WebMVC.Services
@@ -9,7 +8,7 @@ namespace WebMVC.Services
         private HttpClient _httpClient {get;}
         private ILogger<PlateServiceClient> _logger {get;}
 
-        const string addPlatePath = "/api/plate/%s";
+        const string addPlatePath = "/api/plate/{0}";
         const string getPlatesPath = "/api/plate/list";
 
         public PlateServiceClient(HttpClient httpClient, ILogger<PlateServiceClient> logger)
@@ -20,6 +19,8 @@ namespace WebMVC.Services
 
         public async Task<bool> AddPlateAsync(Plate newPlate)
         {
+
+            _logger.LogInformation("Adding plate {PlateId} with registration {Registration}", newPlate.Id.ToString(), newPlate.Registration);
             var response = await _httpClient.PostAsJsonAsync(string.Format(addPlatePath, newPlate.Id.ToString()), newPlate);
             return response.IsSuccessStatusCode;
         }
@@ -32,7 +33,6 @@ namespace WebMVC.Services
                 { "pageSize", $"{pageSize}" },
                 { "pageIndex", $"{pageIndex}" }
             };
-            _logger.LogInformation("Calling service at {Url} on host {BaseAddress}", getPlatesPath, _httpClient.BaseAddress.ToString());
             var url = QueryHelpers.AddQueryString(getPlatesPath, queryParams);
             _logger.LogInformation("Calling service at {Url}", url);
 
@@ -42,7 +42,7 @@ namespace WebMVC.Services
             var paginatedPlates = await response.Content.ReadFromJsonAsync<PaginatedItemsServiceResponse<Plate>>();
             if (paginatedPlates == null)
             {
-                throw new NullReferenceException("Bah, humbug");
+                throw new NullReferenceException("Could not parse service response");
             }
             _logger.LogInformation("Retrieved {PageSize} results from {TotalResults}", paginatedPlates.PageSize, paginatedPlates.TotalCount);
             return paginatedPlates ?? new PaginatedItemsServiceResponse<Plate>();
