@@ -1,5 +1,15 @@
-﻿@model WebMVC.Models.PaginatedPlatesViewModel
-
+﻿@using System.Data.SqlClient;
+@model WebMVC.Models.PaginatedPlatesViewModel
+@functions{
+    public SortOrder chooseOrder(string? sortField, SortOrder order)
+    {
+        if (string.IsNullOrEmpty(sortField))
+        {
+            return SortOrder.Ascending;
+        }
+        return order == SortOrder.Ascending? SortOrder.Descending : SortOrder.Ascending;
+    }
+}
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -8,12 +18,12 @@
     <h1 class="display-4">Welcome</h1>
 
     <a href="/AddPlate">Add New Plate</a>
-
+<h2>@Model.SortField - @Model.SortOrder</h2>
     <table>
         <thead></thead>
             <tr>
                 <td>Registration</td>
-                <td>Price</td>
+                <td>Price <span><a href="?sortField=Price&sortOrder=@chooseOrder(Model.SortField, Model.SortOrder)">^</a></span></td>
                 <td>Letters</td>
                 <td>Numbers</td>
             </tr>
@@ -28,8 +38,8 @@
 }
         </tbody>
     </table>
-    <span><a href=" ?pageIndex=@Html.DisplayFor(modelItem => Model.PreviousPage)">Previous Page</a></span>
+    <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.PreviousPage)">Previous Page</a></span>
     <span>@Html.DisplayFor(modelItem => Model.CurrentPage)</span>
-    <span><a href=" ?pageIndex=@Html.DisplayFor(modelItem => Model.NextPage)">Next Page</a></span>
+    <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.NextPage)">Next Page</a></span>
 
 </div>

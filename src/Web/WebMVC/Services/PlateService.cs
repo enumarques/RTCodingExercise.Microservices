@@ -25,7 +25,12 @@ namespace WebMVC.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<PaginatedItemsServiceResponse<Plate>> GetPlatesAsync(int pageSize, int pageIndex)
+        public async Task<PaginatedItemsServiceResponse<Plate>> GetPlatesAsync(
+            int pageSize,
+            int pageIndex,
+            string? sortField,
+            SortOrder sortOrder
+        )
         {
             _logger.LogInformation("Calling plate storage web service");
             var queryParams = new Dictionary<string, string?>()
@@ -33,6 +38,12 @@ namespace WebMVC.Services
                 { "pageSize", $"{pageSize}" },
                 { "pageIndex", $"{pageIndex}" }
             };
+            if (! string.IsNullOrEmpty(sortField))
+            {
+                queryParams.Add("sortField", sortField);
+                queryParams.Add("sortOrder", sortOrder.ToString());
+            }
+
             var url = QueryHelpers.AddQueryString(getPlatesPath, queryParams);
             _logger.LogInformation("Calling service at {Url}", url);
 

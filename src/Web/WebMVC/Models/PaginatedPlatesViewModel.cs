@@ -7,7 +7,28 @@ namespace WebMVC.Models
         public int? NextPage {get;}
         public int? PreviousPage {get;}
         public int TotalPlates { get; }
+        public string? SortField {get;}
+        public SortOrder SortOrder {get;} = SortOrder.Unspecified;
 
+        public PaginatedPlatesViewModel(
+            IEnumerable<Plate> plates,
+            int currentPage,
+            int? previousPage,
+            int? nextPage,
+            int totalPlates,
+            string? sortField,
+            SortOrder sortOrder
+        )
+        {
+            Plates = plates;
+            CurrentPage = currentPage;
+            PreviousPage = previousPage;
+            NextPage = nextPage;
+            TotalPlates = totalPlates;
+            SortField = sortField;
+            SortOrder = sortOrder;
+        }
+        
         public PaginatedPlatesViewModel(
             IEnumerable<Plate> plates,
             int currentPage,

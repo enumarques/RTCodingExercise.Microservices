@@ -8,6 +8,8 @@ namespace RTCodingExercise.Microservices.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IPlateRepository _plateRepository;
+        const decimal MarkupMultiplier = 1.2m;
+
 
         public HomeController(IPlateRepository plateRepository, ILogger<HomeController> logger)
         {
@@ -15,12 +17,22 @@ namespace RTCodingExercise.Microservices.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int pageIndex = 0)
+        public async Task<IActionResult> Index(int pageIndex = 0, string? sortField = null, SortOrder sortOrder = SortOrder.Unspecified)
         {
             _logger.LogInformation("Page number {PageNumber} requested", pageIndex + 1);
-            var page = await _plateRepository.GetPlatesAsync(pageIndex: pageIndex);
+            var storedPlates = await _plateRepository.GetPlatesAsync(pageIndex: pageIndex, sortField: sortField, sortOrder: sortOrder);
 
-            return View(page);
+            var displayPlates = new PaginatedPlatesViewModel(
+                storedPlates.Items.Select( i => {i.SalePrice *= MarkupMultiplier; return i;} ).ToList(),
+                storedPlates.PageIndex,
+                storedPlates.PageIndex > 0? storedPlates.PageIndex - 1: null,
+                storedPlates.TotalCount > storedPlates.PageIndex * storedPlates.PageSize? storedPlates.PageIndex + 1: null,
+                storedPlates.TotalCount,
+                storedPlates.SortField,
+                storedPlates.SortOrder
+            );
+
+            return View(displayPlates);
         }
 
         [HttpGet]

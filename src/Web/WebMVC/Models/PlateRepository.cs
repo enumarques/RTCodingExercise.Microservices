@@ -8,29 +8,17 @@ namespace WebMVC.Models
         private ILogger<PlateRepository> _logger {get;set;}
         private IPlateServiceClient _plateService {get;set;}
 
-        const decimal MarkupMultiplier = 1.2m;
-
         public PlateRepository(IPlateServiceClient plateService, ILogger<PlateRepository> logger)
         {
             _plateService = plateService;
             _logger = logger;
         }
 
-        public async Task<PaginatedPlatesViewModel> GetPlatesAsync( int pageSize = 20, int pageIndex = 0 )
+        public async Task<PaginatedItemsServiceResponse<Plate>> GetPlatesAsync( int pageSize = 20, int pageIndex = 0, string? sortField = null, SortOrder sortOrder = SortOrder.Unspecified )
         {
             _logger.LogInformation("Retrieving plates from the plate service");
 
-            var storedPlates = await _plateService.GetPlatesAsync(pageSize, pageIndex);
-
-            var displayPlates = new PaginatedPlatesViewModel(
-                storedPlates.Items.Select( i => {i.SalePrice = i.SalePrice * MarkupMultiplier; return i;} ).ToList(),
-                storedPlates.PageIndex,
-                storedPlates.PageIndex > 0? storedPlates.PageIndex - 1: null,
-                storedPlates.TotalCount > storedPlates.PageIndex * storedPlates.PageSize? storedPlates.PageIndex + 1: null,
-                storedPlates.TotalCount
-            );
-
-            return displayPlates;
+            return await _plateService.GetPlatesAsync(pageSize, pageIndex, sortField, sortOrder);
         }
 
         public async Task<bool> AddPlateAsync(
