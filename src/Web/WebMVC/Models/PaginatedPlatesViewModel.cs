@@ -10,7 +10,8 @@ namespace WebMVC.Models
         public string? SortField {get;}
         public SortOrder SortOrder {get;} = SortOrder.Unspecified;
 
-        public PlateFilter Filter { get; set; } = new PlateFilter();
+        public string? LetterFilter { get; set; } = null;
+        public string? NumberFilter { get; set; } = null;
 
         public PaginatedPlatesViewModel(
             IEnumerable<Plate> plates,
@@ -20,7 +21,7 @@ namespace WebMVC.Models
             int totalPlates,
             string? sortField,
             SortOrder sortOrder,
-            PlateFilter filter
+            PlateFilter? filter
         )
         {
             Plates = plates;
@@ -30,7 +31,8 @@ namespace WebMVC.Models
             TotalPlates = totalPlates;
             SortField = sortField;
             SortOrder = sortOrder;
-            Filter = filter;
+            LetterFilter = filter?.Letters;
+            NumberFilter = filter?.Numbers;
         }
         
         public PaginatedPlatesViewModel(

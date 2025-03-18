@@ -1,15 +1,5 @@
 ﻿@using System.Data.SqlClient;
 @model WebMVC.Models.PaginatedPlatesViewModel
-@functions{
-    public SortOrder chooseOrder(string? sortField, SortOrder order)
-    {
-        if (string.IsNullOrEmpty(sortField))
-        {
-            return SortOrder.Ascending;
-        }
-        return order == SortOrder.Ascending? SortOrder.Descending : SortOrder.Ascending;
-    }
-}
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -24,11 +14,11 @@
             <legend>Filter results</legend>
             <span>
                 <label for="Letters">Letters</label>
-                <input type="text" asp-for="@Model.Filter.Letters" />
+                <input type="text" asp-for="@Model.LetterFilter" />
             </span>
             <span>
                 <label for="Numbers">Numbers</label>
-                <input type="number" asp-for="@Model.Filter.Numbers" />
+                <input type="number" asp-for="@Model.NumberFilter" />
             </span>
             <span>
                 <label for="SortField">Order by</label>
@@ -40,7 +30,7 @@
             <span>
                 <label for="SortOrder">Ordering</label>
                 <select asp-for="@Model.SortOrder">
-                    <option value="@SortOrder.Unspecified">&emdash;</option>
+                    <option value="@SortOrder.Unspecified">--</option>
                     <option value="@SortOrder.Ascending">Ascending</option>
                     <option value="@SortOrder.Descending">Descending</option>
                 </select>
@@ -55,7 +45,7 @@
         <thead></thead>
             <tr>
                 <td>Registration</td>
-                <td>Price <span><a href="?sortField=Price&sortOrder=@chooseOrder(Model.SortField, Model.SortOrder)">^</a></span></td>
+                <td>Price</td>
                 <td>Letters</td>
                 <td>Numbers</td>
             </tr>
@@ -70,8 +60,10 @@
 }
         </tbody>
     </table>
-    <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.PreviousPage)">Previous Page</a></span>
+    <span><a href="@ViewData["FirstPageLink"]">First Page</a></span>
+    <span><a href="@(ViewData["PrevPageLink"] != null ? ViewData["PrevPageLink"]:"")">Previous Page</a></span>
     <span>@Model.CurrentPage</span>
-    <span><a href="?pageIndex=@Html.DisplayFor(modelItem => Model.NextPage)">Next Page</a></span>
+    <span><a href="@(ViewData["NextPageLink"] != null ? ViewData["NextPageLink"]:"")">Next Page</a></span>
+    <span><a href="@ViewData["LastPageLink"]">Last Page</a></span>
 
 </div>
