@@ -20,7 +20,7 @@ namespace Catalog.API.Controllers
         [HttpGet]
         [Route("list")]
         [ProducesResponseType(typeof(PaginatedPlates), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListAsync(
+        public IActionResult List(
             [FromQuery]int pageSize = 20,
             [FromQuery]int pageIndex = 0,
             [FromQuery]string? sortField = null,
@@ -45,7 +45,7 @@ namespace Catalog.API.Controllers
                 }
             }
 
-            return Ok(await _plateRepository.GetPlatesAsync(pageIndex, pageSize, sortField, sortOrder, filters));
+            return Ok(_plateRepository.GetPlates(pageIndex, pageSize, sortField, sortOrder, filters));
         }
 
         [HttpPost]
@@ -53,12 +53,12 @@ namespace Catalog.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<IActionResult> AddPlateAsync(
+        public IActionResult AddPlate(
             [FromRoute]Guid Id,
             [FromBody]Plate plateData
         )
         {
-            var result = await _plateRepository.AddPlateAsync(Id, plateData);
+            var result = _plateRepository.AddPlate(Id, plateData);
 
             if (!result.IsSuccess)
             {
