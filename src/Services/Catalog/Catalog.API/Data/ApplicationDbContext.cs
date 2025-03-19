@@ -7,6 +7,6 @@
 
         }
 
-        public DbSet<Plate> Plates { get; set; }
+        public virtual DbSet<Plate> Plates { get; set; }
     }
 }

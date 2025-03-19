@@ -14,25 +14,25 @@ namespace Catalog.API.Models
             _logger = logger;
         }
 
-        public async Task<PaginatedPlates> GetPlatesAsync(
+        public PaginatedPlates GetPlates(
             int pageIndex = 0,
             int pageSize = 20
         )
         {
-            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified, filters: null);
+            return GetPlates( pageIndex, pageSize, null, SortOrder.Unspecified, filters: null);
         }
 
-        public async Task<PaginatedPlates> GetPlatesAsync(
+        public PaginatedPlates GetPlates(
             int pageIndex = 0,
             int pageSize = 20,
             string? sortField = null,
             SortOrder sortOrder = SortOrder.Unspecified
         )
         {
-            return await GetPlatesAsync( pageIndex, pageSize, null, SortOrder.Unspecified, filters: null);
+            return GetPlates( pageIndex, pageSize, sortField, sortOrder, filters: null);
         }
 
-        public async Task<PaginatedPlates> GetPlatesAsync(
+        public PaginatedPlates GetPlates(
             int pageIndex = 0,
             int pageSize = 20,
             string? sortField = null,
@@ -46,20 +46,20 @@ namespace Catalog.API.Models
             {
                 plateListQuery = AddFiltersToQuery(plateListQuery, filters);
             }
-            var totalPlates = await plateListQuery.CountAsync();
+            var totalPlates = plateListQuery.Count();
 
             _logger.LogInformation("Adding sort by {SortField} in {SortOrder}", sortField, sortOrder);
             plateListQuery = AddOrderClauseToQuery( plateListQuery, sortField, sortOrder );
 
-            var plateList = await plateListQuery.Skip(pageSize * pageIndex)
+            var plateList = plateListQuery.Skip(pageSize * pageIndex)
                             .Take(pageSize)
-                            .ToListAsync();
+                            .ToList();
 
             _logger.LogInformation("Retrieved {ResultCount} plates of {TotalPlates} from page {PageIndex}", plateList.Count, totalPlates, pageIndex);
             return new PaginatedPlates(plateList, totalPlates, pageSize, pageIndex, sortField, sortOrder);
         }
 
-        public async Task<Result<Plate>> AddPlateAsync(Guid Id, Plate plateData)
+        public Result<Plate> AddPlate(Guid Id, Plate plateData)
         {
             var validationResult = ValidatePlate(Id, plateData);
             if (validationResult != ValidationResult.Success)
@@ -79,8 +79,8 @@ namespace Catalog.API.Models
             }
 
             plateData.Id = Id;
-            var result = await InventoryContext.Plates.AddAsync(plateData);
-            await InventoryContext.SaveChangesAsync();
+            var result = InventoryContext.Plates.Add(plateData);
+            InventoryContext.SaveChanges();
 
             return new Result<Plate>(result.Entity);
         }
