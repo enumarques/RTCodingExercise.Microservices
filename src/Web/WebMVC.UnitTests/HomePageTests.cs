@@ -67,7 +67,10 @@ namespace WebMVC.UnitTests
             var list = result?.ViewData.Model;
             Assert.IsType<PaginatedPlatesViewModel>(list);
             // this assertion is testing the double instead of the unit 
-            Assert.Equal(expectedPageSize, ((PaginatedPlatesViewModel)list).Plates.Count());
+            Assert.NotNull(list);
+            if (list != null)
+                Assert.Equal(expectedPageSize, ((PaginatedPlatesViewModel)list).Plates.Count());
+            else Assert.True(false, "No plates in view");
         }
 
         [Fact]
@@ -82,9 +85,16 @@ namespace WebMVC.UnitTests
             var secondPage = await UnitUnderTest.Index(pageIndex: expectedPageIndex) as ViewResult;
 
             // Then the new page will have updated page navigation controls
-            var viewModel = secondPage?.ViewData.Model as PaginatedPlatesViewModel;
-            Assert.Equal(expectedPageIndex, viewModel.CurrentPage);
-            Assert.Contains((string)secondPage.ViewData["PrevPageLink"], $"pageIndex={initialPageIndex}");
+            if (secondPage != null)
+            {
+                var viewModel = secondPage.ViewData.Model as PaginatedPlatesViewModel;
+                if (viewModel != null )
+                    Assert.Equal(expectedPageIndex, viewModel.CurrentPage);
+                else Assert.True(false, "No view model to render");
+                var viewData = secondPage.ViewData;
+                Assert.Contains((string?)viewData["PrevPageLink"], $"pageIndex={initialPageIndex}");
+            }
+            else Assert.True(false, "View result not rendered");
         }
 
         [Fact]
