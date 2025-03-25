@@ -17,5 +17,7 @@ namespace Catalog.Domain
         public string? Letters { get; set; }
 
         public int Numbers { get; set; }
+
+        public bool Reserved { get; set; }
     }
 }

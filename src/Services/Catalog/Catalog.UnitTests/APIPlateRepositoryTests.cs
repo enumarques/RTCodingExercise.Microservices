@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Xunit;
 using NSubstitute;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations;
+using NSubstitute.ReceivedExtensions;
 
 namespace Catalog.UnitTests
 {
@@ -124,6 +124,40 @@ namespace Catalog.UnitTests
             Assert.All(plates.Items, item => item.Letters?.Contains(filters.Letters));
         }
 
+
+        [Fact]
+        public void GetPlateOperationReturnsNotFoundIfPlateNotInDb()
+        {
+            // Given
+            var Id = Guid.NewGuid();
+            var mockData = GetMockData();
+            PlatesDouble.Find(Arg.Any<Guid>()).Returns(mockData.FirstOrDefault(i => i.Id == Id));
+
+            // When
+            var result = UnitUnderTest.GetPlate(Id);
+
+            // Then
+            Assert.False(result.IsSuccess);
+            Assert.IsType<KeyNotFoundException>(result.Exception);
+        }
+
+        [Fact]
+        public void GetPlateOperationReturnsPlateIfItExists()
+        {
+            // Given
+            var Id = new Guid("fe4ae31c-c1a4-4df6-94c3-458525280d76");
+            var mockData = GetMockData();
+            PlatesDouble.Find(Arg.Any<Guid>()).Returns(mockData.First(i => i.Id == Id));
+
+            // When
+            var result = UnitUnderTest.GetPlate(Id);
+
+            // Then
+            Assert.True(result.IsSuccess);
+            Assert.IsType<Plate>(result.Value);
+            Assert.Equal(Id, result.Value?.Id);
+        }
+
         // check if added plate shows up in filtered list
         [Fact]
         public void AddPlateShouldAddPlateToRepository()
@@ -144,7 +178,7 @@ namespace Catalog.UnitTests
 #pragma warning disable EF1001 // Internal EF Core API usage.
             var internalEntityEntry = new InternalEntityEntry(
                 Substitute.For<IStateManager>(), 
-                new RuntimeEntityType("T", typeof(Plate), false, null, null, null, ChangeTrackingStrategy.Snapshot, null, false),
+                new RuntimeEntityType("T", typeof(Plate), false, new RuntimeModel(), null, null, ChangeTrackingStrategy.Snapshot, null, false),
                 newPlate);
 #pragma warning restore EF1001 // Internal EF Core API usage.
             var entityEntry = Substitute.For<EntityEntry<Plate>>(internalEntityEntry);
@@ -204,6 +238,23 @@ namespace Catalog.UnitTests
             // Then
             Assert.False(result.IsSuccess);
             Assert.IsType<ValidationException>(result.Exception);
+        }
+
+        [Fact]
+        public void ReservingPlateSetsReservedToTrue()
+        {
+            // Given
+            var Id = new Guid("fe4ae31c-c1a4-4df6-94c3-458525280d76");
+            var mockData = GetMockData();
+            PlatesDouble.Find(Arg.Any<Guid>()).Returns(mockData.FirstOrDefault(i => i.Id == Id));
+
+            // When
+            var result = UnitUnderTest.ReservePlate(Id);
+
+            // Then
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value?.Reserved);
+            Context.Received().SaveChanges();
         }
 
         private IQueryable<Plate> GetMockData()

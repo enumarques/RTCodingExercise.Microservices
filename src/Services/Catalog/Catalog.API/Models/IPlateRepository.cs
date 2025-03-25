@@ -6,6 +6,11 @@ namespace Catalog.API.Models
         public PaginatedPlates GetPlates(int pageIndex, int pageSize, string? sortField, SortOrder sortOrder);
         public PaginatedPlates GetPlates(int pageIndex, int pageSize, string? sortField, SortOrder sortOrder, SearchFilters filters);
 
+        public Result<Plate> GetPlate(Guid id);
+
         public Result<Plate> AddPlate(Guid id, Plate plateData);
+
+        public Result<Plate> ReservePlate(Guid plateId);
+        public Result<Plate> RemoveReservation(Guid plateId);
     }
 }

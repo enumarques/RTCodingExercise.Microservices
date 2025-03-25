@@ -59,6 +59,15 @@ namespace Catalog.API.Models
             return new PaginatedPlates(plateList, totalPlates, pageSize, pageIndex, sortField, sortOrder);
         }
 
+        public Result<Plate> GetPlate(Guid plateId)
+        {
+            var existingPlate = InventoryContext.Plates.Find( plateId );
+            if (existingPlate != null)
+                return new Result<Plate>(existingPlate);
+
+            return new Result<Plate>(new KeyNotFoundException());
+        }
+
         public Result<Plate> AddPlate(Guid Id, Plate plateData)
         {
             var validationResult = ValidatePlate(Id, plateData);
@@ -85,6 +94,33 @@ namespace Catalog.API.Models
             return new Result<Plate>(result.Entity);
         }
 
+        public Result<Plate> ReservePlate( Guid plateId )
+        {
+            var existingPlateResult = GetPlate(plateId);
+
+            if (existingPlateResult.IsSuccess && existingPlateResult.Value is not null)
+            {
+                existingPlateResult.Value.Reserved = true;
+                InventoryContext.SaveChanges();
+
+                return new Result<Plate>(existingPlateResult.Value);
+            }
+            return new Result<Plate>(new KeyNotFoundException());
+        }
+
+        public Result<Plate> RemoveReservation( Guid plateId )
+        {
+            var existingPlateResult = GetPlate(plateId);
+
+            if (existingPlateResult.IsSuccess && existingPlateResult.Value is not null)
+            {
+                existingPlateResult.Value.Reserved = false;
+                InventoryContext.SaveChanges();
+
+                return new Result<Plate>(existingPlateResult.Value);
+            }
+            return new Result<Plate>(new KeyNotFoundException());
+        }
 
         private static IQueryable<Plate> AddOrderClauseToQuery(IQueryable<Plate> query, string? sortField, SortOrder sortOrder)
         {
