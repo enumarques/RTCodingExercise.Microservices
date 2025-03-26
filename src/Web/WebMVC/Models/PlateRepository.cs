@@ -1,7 +1,7 @@
-using WebMVC.Services;
+using RTCodingExercise.Microservices.Services;
 using System.Linq;
 
-namespace WebMVC.Models
+namespace RTCodingExercise.Microservices.Models
 {
     public class PlateRepository: IPlateRepository
     {

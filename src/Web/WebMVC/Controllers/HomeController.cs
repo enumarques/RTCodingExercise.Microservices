@@ -1,6 +1,5 @@
 ﻿using RTCodingExercise.Microservices.Models;
 using System.Diagnostics;
-using WebMVC.Models;
 
 namespace RTCodingExercise.Microservices.Controllers
 {

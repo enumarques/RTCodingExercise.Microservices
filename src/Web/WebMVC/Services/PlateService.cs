@@ -1,7 +1,7 @@
-using WebMVC.Models;
+using RTCodingExercise.Microservices.Models;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace WebMVC.Services
+namespace RTCodingExercise.Microservices.Services
 {
     public class PlateServiceClient : IPlateServiceClient
     {

@@ -1,4 +1,4 @@
-namespace WebMVC.Models
+namespace RTCodingExercise.Microservices.Models
 {
     public class PaginatedItemsServiceResponse<T>
     {

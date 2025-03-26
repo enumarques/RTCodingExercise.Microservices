@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using RTCodingExercise.Microservices.Controllers;
 using Catalog.Domain;
-using WebMVC.Models;
+using RTCodingExercise.Microservices.Models;
 using NSubstitute;
 using Xunit;
 using Microsoft.AspNetCore.Mvc;
@@ -123,7 +123,6 @@ namespace WebMVC.UnitTests
             // Then the add plate service is called to add the new plate
         }
 
- 
         private IQueryable<Plate> GetMockData()
         {
             return new List<Plate>()

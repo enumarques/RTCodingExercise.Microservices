@@ -1,6 +1,6 @@
-using WebMVC.Models;
+using RTCodingExercise.Microservices.Models;
 
-namespace WebMVC.Services
+namespace RTCodingExercise.Microservices.Services
 {
     public interface IPlateServiceClient
     {
