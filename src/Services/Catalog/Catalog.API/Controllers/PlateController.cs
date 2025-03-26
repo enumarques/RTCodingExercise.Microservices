@@ -75,7 +75,22 @@ namespace Catalog.API.Controllers
             return Created($"/api/plate/{Id}", result.Value);
         }
 
+        [HttpPatch]
+        [Route("{Id}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public IActionResult MarkPlateReserved([FromRoute]Guid Id)
+        {
+            var result = _plateRepository.ReservePlate(Id);
 
+            if (!result.IsSuccess)
+            {
+                if (result.Exception is KeyNotFoundException)
+                    _logger.LogError("Plate {PlateId} could not be updated - not found", Id);
+                    return NotFound();
+            }
+            return Ok(result.Value);
+        }
     }
 
 }
